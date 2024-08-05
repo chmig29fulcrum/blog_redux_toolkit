@@ -5,6 +5,8 @@ import mongoose from "mongoose";
 import cookieParser from "cookie-parser";
 import path from "path"; // to join backend with frontend
 
+import testRoutes from "./routes/test";
+
 process.on("unhandledRejection", (err: any) => {
   console.log(err.name, err.message);
   console.log("UNHANDLED REJECTION! 💥 Shutting down...");
@@ -41,6 +43,8 @@ app.use(
   })
 );
 app.use(express.static(path.join(__dirname, "../../frontend/dist"))); // to join backend with frontend
+
+app.use(`/api/${apiVersion}/test`, testRoutes);
 
 const port = process.env.PORT || 5188; // Default to 5000 if PORT is not set
 
