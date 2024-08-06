@@ -1,4 +1,4 @@
-import express, { Request, Response } from "express";
+import express, { Request, Response, NextFunction } from "express";
 import cors from "cors";
 import "dotenv/config";
 import mongoose from "mongoose";
@@ -7,6 +7,8 @@ import path from "path"; // to join backend with frontend
 
 import testRoutes from "./routes/test.route";
 import authRoutes from "./routes/auth.route";
+import AppError from "./utils/appError";
+import globalErrorHandler from "./controllers/errorController";
 
 process.on("unhandledRejection", (err: any) => {
   console.log(err.name, err.message);
@@ -48,6 +50,23 @@ app.use(express.static(path.join(__dirname, "../../frontend/dist"))); // to join
 app.use(`/api/${apiVersion}/test`, testRoutes);
 app.use(`/api/${apiVersion}/auth`, authRoutes);
 
+app.all("*", (req: Request, res: Response, next: NextFunction) => {
+  next(new AppError(`Can't find ${req.originalUrl} on this server!`, 404));
+});
+
+app.use(globalErrorHandler);
+
+/*
+app.use((err: AppError, req: Request, res: Response, next: NextFunction) => {
+  const statusCode = err.statusCode || 500;
+  const message = err.message || "Internal Server Error";
+  res.status(statusCode).json({
+    success: false,
+    statusCode,
+    message,
+  });
+});
+*/
 const port = process.env.PORT || 5188; // Default to 5000 if PORT is not set
 
 mongoose
